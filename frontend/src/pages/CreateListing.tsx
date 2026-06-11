@@ -19,13 +19,15 @@ import {
   Info,
   CheckCircle2,
   Package,
-  Truck
+  Truck,
+  Navigation
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const CreateListing = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
   const [images, setImages] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     title: '',
@@ -35,7 +37,7 @@ const CreateListing = () => {
     mrp: '',
     condition: 'Unopened',
     address: '',
-    location: 'Kondapur',
+    location: 'Nearby',
     expiryDate: '',
     fulfillment: 'both' // pickup, delivery, both
   });
@@ -52,17 +54,46 @@ const CreateListing = () => {
       });
       navigate('/login?redirect=create-listing');
     }
-
-    // Get user location for the listing
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        setFormData(prev => ({
-          ...prev,
-          coordinates: [position.coords.longitude, position.coords.latitude]
-        }));
-      });
-    }
   }, [navigate, toast]);
+
+  const handleGetCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast({ variant: 'destructive', title: 'Geolocation is not supported by your browser' });
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        setFormData(prev => ({ ...prev, coordinates: [longitude, latitude] as any }));
+
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+          const data = await res.json();
+          if (data && data.display_name) {
+            setFormData(prev => ({ 
+              ...prev, 
+              address: data.display_name,
+              location: data.address?.city || data.address?.town || data.address?.suburb || 'Nearby'
+            }));
+          } else {
+            setFormData(prev => ({ ...prev, address: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}` }));
+          }
+          toast({ title: 'Location updated automatically' });
+        } catch (error) {
+          setFormData(prev => ({ ...prev, address: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}` }));
+          toast({ title: 'Location acquired (coordinates only)' });
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      (error) => {
+        setIsLocating(false);
+        toast({ variant: 'destructive', title: 'Failed to get location', description: error.message });
+      }
+    );
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -397,6 +428,16 @@ const CreateListing = () => {
                       value={formData.address}
                       onChange={handleChange}
                     />
+                    <Button 
+                      onClick={handleGetCurrentLocation}
+                      disabled={isLocating}
+                      variant="secondary"
+                      size="sm"
+                      className="absolute bottom-4 right-4 rounded-full font-bold shadow-sm"
+                    >
+                      {isLocating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Navigation className="w-4 h-4 mr-2" />}
+                      Locate Me
+                    </Button>
                   </div>
                   <p className="text-[10px] font-bold text-muted-foreground uppercase text-center mt-2">Only shared with verified buyers after confirmation</p>
                 </div>
