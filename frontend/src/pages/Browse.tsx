@@ -306,22 +306,30 @@ const Browse = () => {
               </div>
             ) : filteredListings.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6 justify-items-center">
-                <AnimatePresence>
+                <AnimatePresence mode="popLayout">
                   {filteredListings.map((item) => (
-                    <ListingCard 
-                      key={item._id} 
-                      id={item._id}
-                      title={item.title}
-                      price={item.price}
-                      mrp={item.mrp}
-                      image={item.images?.[0] || 'https://images.unsplash.com/photo-1584990344321-2766250d1174?auto=format&fit=crop&q=80&w=400'}
-                      condition={item.condition}
-                      category={item.category}
-                      seller={item.seller || { name: 'Neighbor', rating: 5 }}
-                      location={item.location?.name || item.address || 'Nearby'}
-                      distance={item.distance || '0.5 km'}
-                      createdAt={new Date(item.createdAt).toLocaleDateString()}
-                    />
+                    <motion.div
+                      layout
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                      key={item._id}
+                    >
+                      <ListingCard 
+                        id={item._id}
+                        title={item.title}
+                        price={item.price}
+                        mrp={item.mrp}
+                        image={item.images?.[0] || 'https://images.unsplash.com/photo-1584990344321-2766250d1174?auto=format&fit=crop&q=80&w=400'}
+                        condition={item.condition}
+                        category={item.category}
+                        seller={item.seller || { name: 'Neighbor', rating: 5 }}
+                        location={item.location?.name || item.address || 'Nearby'}
+                        distance={item.distance || '0.5 km'}
+                        createdAt={new Date(item.createdAt).toLocaleDateString()}
+                      />
+                    </motion.div>
                   ))}
                 </AnimatePresence>
               </div>

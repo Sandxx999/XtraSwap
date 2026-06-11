@@ -38,5 +38,8 @@ const listingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+listingSchema.index({ status: 1, category: 1, createdAt: -1 });
+listingSchema.index({ seller: 1, createdAt: -1 });
+
 const Listing = mongoose.models.Listing || mongoose.model('Listing', listingSchema);
 export default Listing;

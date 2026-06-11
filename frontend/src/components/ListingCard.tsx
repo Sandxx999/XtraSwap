@@ -53,9 +53,10 @@ const ListingCard = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4 }}
+      whileHover={{ y: -6, scale: 1.02 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       className="group relative flex flex-col w-full max-w-[280px] rounded-2xl bg-white border border-border shadow-sm transition-all duration-200 hover:shadow-lg overflow-hidden"
     >
       {/* Image Section */}

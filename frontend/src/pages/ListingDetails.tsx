@@ -74,7 +74,12 @@ const ListingDetails = () => {
   const seller = listing.seller || { name: 'Neighbor', rating: 5, memberSince: '2024' };
 
   return (
-    <div className="bg-[#F8FAFC] min-h-screen">
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      className="bg-[#F8FAFC] min-h-screen"
+    >
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Breadcrumb & Actions */}
         <div className="flex items-center justify-between mb-8">
