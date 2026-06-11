@@ -255,12 +255,21 @@ const ListingDetails = () => {
 
               {/* Primary Actions */}
               <div className="space-y-3 pt-2">
-                <Button size="lg" className="w-full h-16 text-xl font-black rounded-2xl gap-3 shadow-xl shadow-primary/25 group">
+                <Button 
+                  onClick={() => navigate(`/checkout/${listing._id}`)}
+                  size="lg" 
+                  className="w-full h-16 text-xl font-black rounded-2xl gap-3 shadow-xl shadow-primary/25 group"
+                >
                   <PackageCheck size={24} /> 
                   Buy Now 
                   <ArrowRight size={20} className="ml-1 group-hover:translate-x-1 transition-transform" />
                 </Button>
-                <Button variant="outline" size="lg" className="w-full h-16 text-lg font-bold rounded-2xl border-2 hover:bg-slate-50 gap-2">
+                <Button 
+                  onClick={() => navigate(`/inbox?listing=${listing._id}&user=${listing.seller?._id || 'unknown'}`)}
+                  variant="outline" 
+                  size="lg" 
+                  className="w-full h-16 text-lg font-bold rounded-2xl border-2 hover:bg-slate-50 gap-2"
+                >
                   <MessageSquare size={20} className="text-primary" /> Chat with Seller
                 </Button>
               </div>

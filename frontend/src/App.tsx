@@ -8,6 +8,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import CreateListing from './pages/CreateListing';
 import ListingDetails from './pages/ListingDetails';
+import Inbox from './pages/Inbox';
+import Checkout from './pages/Checkout';
 import { Toaster } from "@/components/ui/toaster"
 
 function App() {
@@ -23,6 +25,8 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/create-listing" element={<CreateListing />} />
             <Route path="/listing/:id" element={<ListingDetails />} />
+            <Route path="/inbox" element={<Inbox />} />
+            <Route path="/checkout/:id" element={<Checkout />} />
           </Routes>
         </main>
         <MobileBottomNav />

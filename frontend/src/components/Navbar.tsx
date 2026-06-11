@@ -7,7 +7,7 @@ import {
   LogOut,
   LayoutDashboard,
   Menu,
-  Bell,
+  MessageSquare,
   MapPin,
   X
 } from 'lucide-react';
@@ -84,9 +84,12 @@ const Navbar = () => {
         {/* Right Side Actions */}
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary rounded-full">
-              <Bell size={20} />
-            </Button>
+            <Link to="/inbox">
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary rounded-full relative">
+                <MessageSquare size={20} />
+                <span className="absolute top-2 right-2 w-2 h-2 bg-danger rounded-full" />
+              </Button>
+            </Link>
             
             {userInfo ? (
               <DropdownMenu>

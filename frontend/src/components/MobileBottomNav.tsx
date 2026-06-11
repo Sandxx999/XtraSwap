@@ -37,12 +37,13 @@ const MobileBottomNav = () => {
         </NavLink>
         
         <NavLink 
-          to="/chats" 
+          to="/inbox" 
           className={({ isActive }) => 
-            `flex flex-col items-center gap-1 ${isActive ? 'text-primary' : 'text-muted-foreground'}`
+            `flex flex-col items-center gap-1 relative ${isActive ? 'text-primary' : 'text-muted-foreground'}`
           }
         >
           <MessageSquare size={22} />
+          <span className="absolute top-0 right-1 w-2 h-2 bg-danger rounded-full" />
           <span className="text-[10px] font-semibold">Chats</span>
         </NavLink>
         
