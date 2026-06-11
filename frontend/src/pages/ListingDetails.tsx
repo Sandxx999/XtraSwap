@@ -36,36 +36,28 @@ const ListingDetails = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // In a real app, this would be an API call
-    // Mocking for UI demonstration
-    setTimeout(() => {
-      const mockListing = {
-        id: id,
-        title: 'Fresh Organic Avocados - Pack of 3',
-        price: 150,
-        mrp: 299,
-        category: 'Food & Groceries',
-        condition: 'Unopened',
-        description: 'Perfectly ripe avocados, bought yesterday but we got an extra batch. These are high-quality organic avocados from the local farm market. Great for guacamole or breakfast toast!',
-        address: 'Tower 4, MyHome Avatar, Puppalguda',
-        location: 'Kondapur',
-        distance: '0.8 km',
-        images: ['https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&q=80&w=800'],
-        expiryDate: '2026-06-12',
-        seller: {
-          name: 'Priya Kapoor',
-          rating: 4.8,
-          avatar: '',
-          memberSince: 'Oct 2024',
-          responseTime: '< 15 mins'
-        },
-        postedDate: '2 hours ago',
-        views: 42
-      };
-      setListing(mockListing);
-      setLoading(false);
-    }, 800);
-  }, [id]);
+    const fetchListing = async () => {
+      setLoading(true);
+      try {
+        const { data } = await API.get(`/listings/${id}`);
+        setListing(data);
+      } catch (error) {
+        console.error('Error fetching listing:', error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Could not find this listing.",
+        });
+        navigate('/browse');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchListing();
+    }
+  }, [id, navigate, toast]);
 
   if (loading) {
     return (
@@ -78,7 +70,8 @@ const ListingDetails = () => {
 
   if (!listing) return null;
 
-  const discount = Math.round(((listing.mrp - listing.price) / listing.mrp) * 100);
+  const discount = listing.mrp ? Math.round(((listing.mrp - listing.price) / listing.mrp) * 100) : 0;
+  const seller = listing.seller || { name: 'Neighbor', rating: 5, memberSince: '2024' };
 
   return (
     <div className="bg-[#F8FAFC] min-h-screen">
@@ -106,7 +99,7 @@ const ListingDetails = () => {
               animate={{ opacity: 1, x: 0 }}
               className="aspect-square bg-white rounded-[32px] overflow-hidden border border-border shadow-sm relative group"
             >
-              <img src={listing.images[0]} alt={listing.title} className="w-full h-full object-cover" />
+              <img src={listing.images?.[0] || 'https://images.unsplash.com/photo-1584990344321-2766250d1174?auto=format&fit=crop&q=80&w=800'} alt={listing.title} className="w-full h-full object-cover" />
               <div className="absolute top-6 left-6 flex flex-col gap-3">
                 <Badge className="bg-accent text-white border-none font-bold px-3 py-1 shadow-md uppercase tracking-wider text-[10px]">
                   {listing.condition}
@@ -118,9 +111,9 @@ const ListingDetails = () => {
             </motion.div>
             
             <div className="grid grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map((i) => (
+              {listing.images?.map((img: string, i: number) => (
                 <div key={i} className="aspect-square bg-white border border-border rounded-2xl overflow-hidden cursor-pointer hover:border-primary transition-colors p-1">
-                  <div className="w-full h-full bg-slate-100 rounded-xl" />
+                  <img src={img} className="w-full h-full object-cover rounded-xl" />
                 </div>
               ))}
             </div>
@@ -146,7 +139,7 @@ const ListingDetails = () => {
                     </div>
                     <div className="flex justify-between py-2 border-b border-dashed">
                       <span className="text-muted-foreground">Posted Date</span>
-                      <span className="font-bold">{listing.postedDate}</span>
+                      <span className="font-bold">{new Date(listing.createdAt).toLocaleDateString()}</span>
                     </div>
                   </div>
                 </div>
@@ -179,7 +172,7 @@ const ListingDetails = () => {
                   <div className="absolute bottom-6 left-6 right-6 p-4 bg-white/90 backdrop-blur-md rounded-2xl shadow-lg border border-white/20">
                     <p className="text-sm font-bold flex items-center gap-2">
                       <MapPin size={16} className="text-primary" />
-                      {listing.location} • {listing.distance} away
+                      {listing.location?.name || listing.address || 'Kondapur'} • {listing.distance || '0.5 km'} away
                     </p>
                     <p className="text-[10px] text-muted-foreground font-bold uppercase mt-1">Exact address shared after purchase</p>
                   </div>
@@ -199,16 +192,20 @@ const ListingDetails = () => {
                 <h1 className="text-3xl font-extrabold leading-tight">{listing.title}</h1>
                 <div className="flex items-center gap-2 text-muted-foreground text-sm">
                   <Clock size={14} /> 
-                  <span>Posted {listing.postedDate} • {listing.views} views</span>
+                  <span>Posted {new Date(listing.createdAt).toLocaleDateString()} • {listing.views || 0} views</span>
                 </div>
               </div>
 
               <div className="flex items-baseline gap-3">
                 <span className="text-5xl font-black text-primary">₹{listing.price}</span>
-                <span className="text-xl text-muted-foreground line-through font-medium">₹{listing.mrp}</span>
-                <Badge className="bg-accent text-white border-none font-black px-2 py-0.5 rounded-lg text-sm">
-                  {discount}% OFF
-                </Badge>
+                {listing.mrp && (
+                  <>
+                    <span className="text-xl text-muted-foreground line-through font-medium">₹{listing.mrp}</span>
+                    <Badge className="bg-accent text-white border-none font-black px-2 py-0.5 rounded-lg text-sm">
+                      {discount}% OFF
+                    </Badge>
+                  </>
+                )}
               </div>
 
               {/* Fulfillment Toggle */}
@@ -273,19 +270,19 @@ const ListingDetails = () => {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-14 w-14 border-2 border-primary/10 p-0.5">
-                      <AvatarImage src={listing.seller.avatar} />
+                      <AvatarImage src={seller.avatar} />
                       <AvatarFallback className="bg-primary/5 text-primary font-black text-lg">
-                        {listing.seller.name.charAt(0)}
+                        {seller.name.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="font-bold text-lg leading-none mb-1">{listing.seller.name}</h3>
+                      <h3 className="font-bold text-lg leading-none mb-1">{seller.name}</h3>
                       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                         <div className="flex items-center text-warning font-black">
                           <Star size={12} fill="currentColor" className="mr-0.5" />
-                          {listing.seller.rating}
+                          {seller.rating || 5}
                         </div>
-                        <span>• Member since {listing.seller.memberSince}</span>
+                        <span>• Member since {seller.memberSince || '2024'}</span>
                       </div>
                     </div>
                   </div>
@@ -293,7 +290,7 @@ const ListingDetails = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-3 bg-slate-50 rounded-xl">
                     <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1">Response Time</p>
-                    <p className="text-xs font-bold">{listing.seller.responseTime}</p>
+                    <p className="text-xs font-bold">{seller.responseTime || '< 15 mins'}</p>
                   </div>
                   <div className="p-3 bg-slate-50 rounded-xl">
                     <p className="text-[10px] font-bold text-muted-foreground uppercase mb-1">Verification</p>
