@@ -56,7 +56,7 @@ const analyzeImage = async (req: Request, res: Response) => {
     res.json(parsedData);
   } catch (error: any) {
     console.error('AI Analysis Error:', error);
-    res.status(500).json({ message: 'Failed to analyze image with AI' });
+    res.status(500).json({ message: 'Failed to analyze image with AI', details: error.message || error.toString() });
   }
 };
 

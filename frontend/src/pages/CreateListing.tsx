@@ -24,8 +24,11 @@ import {
   Sparkles
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Webcam from 'react-webcam';
 
 const CreateListing = () => {
+  const webcamRef = React.useRef<any>(null);
+  const [showCamera, setShowCamera] = useState(false);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
@@ -127,18 +130,33 @@ const CreateListing = () => {
         description: "We've auto-filled the details for you. Please review.",
       });
       setStep(2); // Auto-advance to details step
-    } catch (error) {
+    } catch (error: any) {
       console.error('AI Analysis failed:', error);
+      const errorMsg = error.response?.data?.details || error.response?.data?.message || "Could not auto-detect product details. Please fill them manually.";
       toast({
         variant: "destructive",
         title: "AI Analysis Failed",
-        description: "Could not auto-detect product details. Please fill them manually.",
+        description: errorMsg,
       });
       setStep(2); // Advance anyway
     } finally {
       setIsAnalyzing(false);
     }
   };
+
+  const captureImage = React.useCallback(() => {
+    const imageSrc = webcamRef.current?.getScreenshot();
+    if (imageSrc) {
+      setImages(prev => {
+        const newImages = [...prev, imageSrc];
+        if (prev.length === 0) {
+          analyzeWithAI(imageSrc);
+        }
+        return newImages;
+      });
+      setShowCamera(false);
+    }
+  }, [webcamRef]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -283,6 +301,27 @@ const CreateListing = () => {
                   <h2 className="text-2xl font-black text-center">Gemini AI is analyzing...</h2>
                   <p className="text-muted-foreground text-center">Identifying product category, writing description, and assessing condition.</p>
                 </div>
+              ) : showCamera ? (
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="relative w-full aspect-square md:aspect-video rounded-[32px] overflow-hidden bg-black shadow-lg">
+                    <Webcam
+                      audio={false}
+                      ref={webcamRef}
+                      screenshotFormat="image/jpeg"
+                      videoConstraints={{ facingMode: "environment" }}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 pointer-events-none border-[6px] border-primary/20 rounded-[32px] m-4" />
+                  </div>
+                  <div className="flex gap-4">
+                    <Button variant="outline" onClick={() => setShowCamera(false)} className="rounded-full h-14 px-8 font-bold">
+                      Cancel
+                    </Button>
+                    <Button onClick={captureImage} className="rounded-full h-14 px-10 text-lg font-black shadow-xl shadow-primary/25 gap-2">
+                      <Camera size={20} /> Capture & Analyze
+                    </Button>
+                  </div>
+                </div>
               ) : (
                 <>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -299,16 +338,31 @@ const CreateListing = () => {
                     ))}
                     
                     {images.length < 5 && (
-                      <label className="aspect-square rounded-[24px] border-2 border-dashed border-primary/50 bg-primary/5 flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-primary hover:bg-primary/10 transition-all group">
-                        <div className="p-4 bg-white rounded-full text-primary group-hover:scale-110 transition-transform shadow-sm">
-                          <Camera size={28} />
-                        </div>
-                        <div className="text-center">
-                          <p className="text-sm font-bold text-primary">Snap & Auto-Fill</p>
-                          <p className="text-[10px] text-primary/70 uppercase font-bold mt-1">Requires 1 clear photo</p>
-                        </div>
-                        <input type="file" className="hidden" onChange={handleImageUpload} accept="image/*" capture="environment" />
-                      </label>
+                      <>
+                        <button 
+                          onClick={() => setShowCamera(true)}
+                          className="aspect-square rounded-[24px] border-2 border-primary border-solid bg-primary text-white flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-primary/90 transition-all shadow-md"
+                        >
+                          <div className="p-4 bg-white/20 rounded-full text-white">
+                            <Camera size={28} />
+                          </div>
+                          <div className="text-center">
+                            <p className="text-sm font-bold text-white">Live Camera</p>
+                            <p className="text-[10px] text-white/80 uppercase font-bold mt-1">Instant Scan</p>
+                          </div>
+                        </button>
+
+                        <label className="aspect-square rounded-[24px] border-2 border-dashed border-primary/50 bg-primary/5 flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-primary hover:bg-primary/10 transition-all group">
+                          <div className="p-4 bg-white rounded-full text-primary group-hover:scale-110 transition-transform shadow-sm">
+                            <Upload size={28} />
+                          </div>
+                          <div className="text-center">
+                            <p className="text-sm font-bold text-primary">Upload Photo</p>
+                            <p className="text-[10px] text-primary/70 uppercase font-bold mt-1">From Gallery</p>
+                          </div>
+                          <input type="file" className="hidden" onChange={handleImageUpload} accept="image/*" />
+                        </label>
+                      </>
                     )}
                   </div>
 
