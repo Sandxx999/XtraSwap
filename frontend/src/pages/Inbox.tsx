@@ -35,7 +35,7 @@ const Inbox = () => {
   }, [navigate]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
 
     if (activeChat) {
       fetchMessages(activeChat.listing._id, activeChat.otherUser._id);
