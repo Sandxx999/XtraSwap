@@ -20,7 +20,8 @@ import {
   CheckCircle2,
   Package,
   Truck,
-  Navigation
+  Navigation,
+  Sparkles
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -28,6 +29,7 @@ const CreateListing = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [images, setImages] = useState<string[]>([]);
   const [formData, setFormData] = useState({
     title: '',
@@ -39,7 +41,7 @@ const CreateListing = () => {
     address: '',
     location: 'Nearby',
     expiryDate: '',
-    fulfillment: 'both' // pickup, delivery, both
+    fulfillment: 'both'
   });
   
   const navigate = useNavigate();
@@ -99,13 +101,57 @@ const CreateListing = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const analyzeWithAI = async (base64Image: string) => {
+    setIsAnalyzing(true);
+    try {
+      const userInfoStr = localStorage.getItem('userInfo');
+      if (!userInfoStr) throw new Error('Not logged in');
+      const userInfo = JSON.parse(userInfoStr);
+
+      const config = {
+        headers: { Authorization: `Bearer ${userInfo.token}` },
+      };
+
+      const { data } = await API.post('/ai/analyze', { image: base64Image }, config);
+      
+      setFormData(prev => ({
+        ...prev,
+        title: data.title || prev.title,
+        description: data.description || prev.description,
+        category: data.category || prev.category,
+        condition: data.condition || prev.condition,
+      }));
+
+      toast({
+        title: "✨ AI Magic Complete!",
+        description: "We've auto-filled the details for you. Please review.",
+      });
+      setStep(2); // Auto-advance to details step
+    } catch (error) {
+      console.error('AI Analysis failed:', error);
+      toast({
+        variant: "destructive",
+        title: "AI Analysis Failed",
+        description: "Could not auto-detect product details. Please fill them manually.",
+      });
+      setStep(2); // Advance anyway
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Mock image upload for UI - in a real app, this would upload to S3/Cloudinary
     if (e.target.files && e.target.files[0]) {
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
-          setImages([...images, event.target.result as string]);
+          const base64Str = event.target.result as string;
+          setImages([...images, base64Str]);
+          
+          // Trigger AI analysis on the first image uploaded
+          if (images.length === 0) {
+            analyzeWithAI(base64Str);
+          }
         }
       };
       reader.readAsDataURL(e.target.files[0]);
@@ -196,49 +242,64 @@ const CreateListing = () => {
               className="space-y-8"
             >
               <div className="text-center space-y-2">
-                <h1 className="text-3xl font-black">Upload Photos</h1>
-                <p className="text-secondary-foreground">Add up to 5 clear photos of your item.</p>
+                <h1 className="text-3xl font-black">AI Product Scanner</h1>
+                <p className="text-secondary-foreground">Upload a photo. Our AI will automatically identify the product, condition, and write a description for you!</p>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {images.map((img, i) => (
-                  <div key={i} className="relative aspect-square rounded-[24px] overflow-hidden group shadow-sm border border-border">
-                    <img src={img} className="w-full h-full object-cover" alt="Upload" />
-                    <button 
-                      onClick={() => removeImage(i)}
-                      className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X size={16} />
-                    </button>
+              {isAnalyzing ? (
+                <div className="flex flex-col items-center justify-center py-20 space-y-6">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping" />
+                    <div className="relative bg-primary text-white p-6 rounded-full shadow-2xl">
+                      <Sparkles size={48} className="animate-pulse" />
+                    </div>
                   </div>
-                ))}
-                
-                {images.length < 5 && (
-                  <label className="aspect-square rounded-[24px] border-2 border-dashed border-slate-300 bg-white flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group">
-                    <div className="p-4 bg-slate-50 rounded-full text-slate-400 group-hover:text-primary transition-colors">
-                      <Camera size={28} />
-                    </div>
-                    <div className="text-center">
-                      <p className="text-sm font-bold">Add Photo</p>
-                      <p className="text-[10px] text-muted-foreground uppercase font-bold mt-1">PNG, JPG up to 10MB</p>
-                    </div>
-                    <input type="file" className="hidden" onChange={handleImageUpload} accept="image/*" />
-                  </label>
-                )}
-              </div>
+                  <h2 className="text-2xl font-black text-center">Gemini AI is analyzing...</h2>
+                  <p className="text-muted-foreground text-center">Identifying product category, writing description, and assessing condition.</p>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {images.map((img, i) => (
+                      <div key={i} className="relative aspect-square rounded-[24px] overflow-hidden group shadow-sm border border-border">
+                        <img src={img} className="w-full h-full object-cover" alt="Upload" />
+                        <button 
+                          onClick={() => removeImage(i)}
+                          className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ))}
+                    
+                    {images.length < 5 && (
+                      <label className="aspect-square rounded-[24px] border-2 border-dashed border-primary/50 bg-primary/5 flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-primary hover:bg-primary/10 transition-all group">
+                        <div className="p-4 bg-white rounded-full text-primary group-hover:scale-110 transition-transform shadow-sm">
+                          <Camera size={28} />
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm font-bold text-primary">Snap & Auto-Fill</p>
+                          <p className="text-[10px] text-primary/70 uppercase font-bold mt-1">Requires 1 clear photo</p>
+                        </div>
+                        <input type="file" className="hidden" onChange={handleImageUpload} accept="image/*" capture="environment" />
+                      </label>
+                    )}
+                  </div>
 
-              <div className="p-4 bg-primary/5 rounded-2xl flex items-start gap-3 border border-primary/10">
-                <Info className="text-primary mt-0.5" size={18} />
-                <p className="text-xs font-semibold text-primary/80 leading-relaxed">
-                  Pro tip: Listings with clear photos sell 4x faster! Include different angles and any original packaging.
-                </p>
-              </div>
+                  <div className="p-4 bg-primary/5 rounded-2xl flex items-start gap-3 border border-primary/10">
+                    <Sparkles className="text-primary mt-0.5" size={18} />
+                    <p className="text-xs font-semibold text-primary/80 leading-relaxed">
+                      AI Auto-Fill is mandatory. We use Gemini Vision AI to instantly write your listing and categorize it correctly. You can edit the details in the next step.
+                    </p>
+                  </div>
 
-              <div className="flex justify-end pt-8">
-                <Button onClick={nextStep} className="rounded-full h-14 px-10 text-lg font-bold shadow-xl shadow-primary/25 gap-2">
-                  Next Step <ChevronRight size={20} />
-                </Button>
-              </div>
+                  <div className="flex justify-end pt-8">
+                    <Button onClick={nextStep} disabled={images.length === 0} className="rounded-full h-14 px-10 text-lg font-bold shadow-xl shadow-primary/25 gap-2">
+                      Skip AI (Manual) <ChevronRight size={20} />
+                    </Button>
+                  </div>
+                </>
+              )}
             </motion.div>
           )}
 
