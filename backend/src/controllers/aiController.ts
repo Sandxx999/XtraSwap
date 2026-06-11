@@ -16,7 +16,10 @@ const analyzeImage = async (req: Request, res: Response) => {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      generationConfig: { responseMimeType: "application/json" }
+    });
 
     // Extract base64 and mime type
     const matches = image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
@@ -30,7 +33,6 @@ const analyzeImage = async (req: Request, res: Response) => {
 
     const prompt = `Analyze this image of an item someone is trying to sell on a neighborhood marketplace.
     Identify the product, its likely condition, and write a compelling title and description.
-    Return ONLY a raw JSON object with no markdown formatting, no code blocks, and no extra text.
     The JSON must have these exact keys:
     - "title": A short, catchy title (max 50 chars).
     - "description": A friendly, detailed description of the item.
@@ -49,9 +51,7 @@ const analyzeImage = async (req: Request, res: Response) => {
     const result = await model.generateContent([prompt, ...imageParts]);
     const text = result.response.text();
 
-    // Clean up markdown if Gemini returned it despite instructions
-    const cleanText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-    const parsedData = JSON.parse(cleanText);
+    const parsedData = JSON.parse(text);
 
     res.json(parsedData);
   } catch (error: any) {

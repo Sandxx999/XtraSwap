@@ -142,19 +142,45 @@ const CreateListing = () => {
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
       const reader = new FileReader();
+      
       reader.onload = (event) => {
-        if (event.target?.result) {
-          const base64Str = event.target.result as string;
-          setImages([...images, base64Str]);
-          
-          // Trigger AI analysis on the first image uploaded
-          if (images.length === 0) {
-            analyzeWithAI(base64Str);
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const MAX_SIZE = 800; // Compress to max 800px to stay well under 4.5MB limit
+
+          if (width > height && width > MAX_SIZE) {
+            height *= MAX_SIZE / width;
+            width = MAX_SIZE;
+          } else if (height > MAX_SIZE) {
+            width *= MAX_SIZE / height;
+            height = MAX_SIZE;
           }
-        }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Export as compressed JPEG
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          
+          setImages(prev => {
+            const newImages = [...prev, compressedBase64];
+            // Trigger AI analysis if this is the first image being added
+            if (prev.length === 0) {
+              analyzeWithAI(compressedBase64);
+            }
+            return newImages;
+          });
+        };
+        img.src = event.target?.result as string;
       };
-      reader.readAsDataURL(e.target.files[0]);
+      reader.readAsDataURL(file);
     }
   };
 
