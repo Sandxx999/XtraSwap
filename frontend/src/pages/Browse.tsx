@@ -27,6 +27,8 @@ const categories = [
   { label: 'Clothing', icon: '👗' },
   { label: 'Books', icon: '📚' },
   { label: 'Personal Care', icon: '🧴' },
+  { label: 'Gaming', icon: '🎮' },
+  { label: 'Kids', icon: '🧸' },
 ];
 
 const sampleListings = [

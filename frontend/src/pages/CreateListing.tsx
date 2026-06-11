@@ -423,6 +423,9 @@ const CreateListing = () => {
                       <option>Household</option>
                       <option>Clothing</option>
                       <option>Books</option>
+                      <option>Personal Care</option>
+                      <option>Gaming</option>
+                      <option>Kids</option>
                     </select>
                   </div>
                   <div className="space-y-2">
