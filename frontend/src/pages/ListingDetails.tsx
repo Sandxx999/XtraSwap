@@ -326,7 +326,7 @@ const ListingDetails = () => {
           </div>
         </section>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
