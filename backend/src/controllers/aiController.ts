@@ -16,10 +16,11 @@ const analyzeImage = async (req: Request, res: Response) => {
     }
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-flash-latest",
-      generationConfig: { responseMimeType: "application/json" }
-    });
+    
+    // Array of models to try, starting with the most capable for images
+    const modelsToTry = ["gemini-1.5-pro", "gemini-1.5-flash", "gemini-pro-vision"];
+    let parsedData = null;
+    let lastError = null;
 
     // Extract base64 and mime type
     const matches = image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
@@ -48,10 +49,33 @@ const analyzeImage = async (req: Request, res: Response) => {
       }
     ];
 
-    const result = await model.generateContent([prompt, ...imageParts]);
-    const text = result.response.text();
+    for (const modelName of modelsToTry) {
+      try {
+        console.log(`Trying Gemini model: ${modelName}`);
+        const model = genAI.getGenerativeModel({ 
+          model: modelName,
+          generationConfig: { responseMimeType: "application/json" }
+        });
 
-    const parsedData = JSON.parse(text);
+        const result = await model.generateContent([prompt, ...imageParts]);
+        const text = result.response.text();
+        
+        // Clean up markdown if Gemini returned it despite instructions
+        const cleanText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+        parsedData = JSON.parse(cleanText);
+        
+        // If successful, break out of the retry loop
+        break; 
+      } catch (error: any) {
+        console.warn(`Model ${modelName} failed:`, error.message);
+        lastError = error;
+        // Continue to the next model in the array
+      }
+    }
+
+    if (!parsedData) {
+      throw lastError || new Error("All AI models failed to respond.");
+    }
 
     res.json(parsedData);
   } catch (error: any) {
