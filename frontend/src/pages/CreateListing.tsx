@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import API from '@/lib/api';
+// ... rest of imports
 import { 
   Loader2, 
   Camera, 
@@ -27,8 +29,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Webcam from 'react-webcam';
 
 const CreateListing = () => {
+  const { t } = useTranslation();
   const webcamRef = React.useRef<any>(null);
   const [showCamera, setShowCamera] = useState(false);
+  // ... rest of state
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
@@ -149,9 +153,8 @@ const CreateListing = () => {
     if (imageSrc) {
       setImages(prev => {
         const newImages = [...prev, imageSrc];
-        if (prev.length === 0) {
-          analyzeWithAI(imageSrc);
-        }
+        // Trigger AI analysis even if not first image, if user explicitly captures
+        analyzeWithAI(imageSrc);
         return newImages;
       });
       setShowCamera(false);
@@ -189,10 +192,8 @@ const CreateListing = () => {
           
           setImages(prev => {
             const newImages = [...prev, compressedBase64];
-            // Trigger AI analysis if this is the first image being added
-            if (prev.length === 0) {
-              analyzeWithAI(compressedBase64);
-            }
+            // Trigger AI analysis for uploaded image
+            analyzeWithAI(compressedBase64);
             return newImages;
           });
         };
@@ -244,10 +245,10 @@ const CreateListing = () => {
   };
 
   const steps = [
-    { id: 1, label: 'Photos' },
-    { id: 2, label: 'Details' },
-    { id: 3, label: 'Pricing' },
-    { id: 4, label: 'Review' }
+    { id: 1, label: t('createListing.photos', 'Photos') },
+    { id: 2, label: t('createListing.itemDetails', 'Details') },
+    { id: 3, label: t('createListing.pricingLogistics', 'Pricing') },
+    { id: 4, label: t('createListing.review', 'Review') }
   ];
 
   return (
@@ -286,8 +287,8 @@ const CreateListing = () => {
               className="space-y-8"
             >
               <div className="text-center space-y-2">
-                <h1 className="text-3xl font-black">AI Product Scanner</h1>
-                <p className="text-secondary-foreground">Upload a photo. Our AI will automatically identify the product, condition, and write a description for you!</p>
+                <h1 className="text-3xl font-black">{t('createListing.aiScanner')}</h1>
+                <p className="text-secondary-foreground">{t('createListing.aiSubtitle')}</p>
               </div>
 
               {isAnalyzing ? (
@@ -298,8 +299,8 @@ const CreateListing = () => {
                       <Sparkles size={48} className="animate-pulse" />
                     </div>
                   </div>
-                  <h2 className="text-2xl font-black text-center">Gemini AI is analyzing...</h2>
-                  <p className="text-muted-foreground text-center">Identifying product category, writing description, and assessing condition.</p>
+                  <h2 className="text-2xl font-black text-center">{t('createListing.aiAnalyzing')}</h2>
+                  <p className="text-muted-foreground text-center">{t('createListing.aiAnalyzingSubtitle')}</p>
                 </div>
               ) : showCamera ? (
                 <div className="flex flex-col items-center space-y-4">
@@ -315,10 +316,10 @@ const CreateListing = () => {
                   </div>
                   <div className="flex gap-4">
                     <Button variant="outline" onClick={() => setShowCamera(false)} className="rounded-full h-14 px-8 font-bold">
-                      Cancel
+                      {t('common.cancel', 'Cancel')}
                     </Button>
                     <Button onClick={captureImage} className="rounded-full h-14 px-10 text-lg font-black shadow-xl shadow-primary/25 gap-2">
-                      <Camera size={20} /> Capture & Analyze
+                      <Camera size={20} /> {t('createListing.instantScan')}
                     </Button>
                   </div>
                 </div>
@@ -347,8 +348,8 @@ const CreateListing = () => {
                             <Camera size={28} />
                           </div>
                           <div className="text-center">
-                            <p className="text-sm font-bold text-white">Live Camera</p>
-                            <p className="text-[10px] text-white/80 uppercase font-bold mt-1">Instant Scan</p>
+                            <p className="text-sm font-bold text-white">{t('createListing.liveCamera')}</p>
+                            <p className="text-[10px] text-white/80 uppercase font-bold mt-1">{t('createListing.instantScan')}</p>
                           </div>
                         </button>
 
@@ -357,8 +358,8 @@ const CreateListing = () => {
                             <Upload size={28} />
                           </div>
                           <div className="text-center">
-                            <p className="text-sm font-bold text-primary">Upload Photo</p>
-                            <p className="text-[10px] text-primary/70 uppercase font-bold mt-1">From Gallery</p>
+                            <p className="text-sm font-bold text-primary">{t('createListing.uploadPhoto')}</p>
+                            <p className="text-[10px] text-primary/70 uppercase font-bold mt-1">{t('createListing.fromGallery')}</p>
                           </div>
                           <input type="file" className="hidden" onChange={handleImageUpload} accept="image/*" />
                         </label>
@@ -369,13 +370,13 @@ const CreateListing = () => {
                   <div className="p-4 bg-primary/5 rounded-2xl flex items-start gap-3 border border-primary/10">
                     <Sparkles className="text-primary mt-0.5" size={18} />
                     <p className="text-xs font-semibold text-primary/80 leading-relaxed">
-                      AI Auto-Fill is mandatory. We use Gemini Vision AI to instantly write your listing and categorize it correctly. You can edit the details in the next step.
+                      {t('createListing.aiMandatory')}
                     </p>
                   </div>
 
                   <div className="flex justify-end pt-8">
                     <Button onClick={nextStep} disabled={images.length === 0} className="rounded-full h-14 px-10 text-lg font-bold shadow-xl shadow-primary/25 gap-2">
-                      Skip AI (Manual) <ChevronRight size={20} />
+                      {t('common.next', 'Next')} <ChevronRight size={20} />
                     </Button>
                   </div>
                 </>
@@ -393,13 +394,13 @@ const CreateListing = () => {
               className="space-y-8"
             >
               <div className="text-center space-y-2">
-                <h1 className="text-3xl font-black">Item Details</h1>
+                <h1 className="text-3xl font-black">{t('createListing.itemDetails')}</h1>
                 <p className="text-secondary-foreground">Provide basic info about your item.</p>
               </div>
 
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground ml-1">Item Title</label>
+                  <label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground ml-1">{t('createListing.itemTitle')}</label>
                   <Input 
                     name="title" 
                     placeholder="e.g., Unopened Organic Almond Milk" 
@@ -411,41 +412,41 @@ const CreateListing = () => {
 
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground ml-1">Category</label>
+                    <label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground ml-1">{t('navbar.categories')}</label>
                     <select 
                       name="category"
                       className="w-full h-14 rounded-2xl bg-white border border-border px-4 text-sm font-bold focus:ring-2 focus:ring-primary outline-none"
                       value={formData.category}
                       onChange={handleChange}
                     >
-                      <option>Food & Groceries</option>
-                      <option>Electronics</option>
-                      <option>Household</option>
-                      <option>Clothing</option>
-                      <option>Books</option>
-                      <option>Personal Care</option>
-                      <option>Gaming</option>
-                      <option>Kids</option>
+                      <option value="Food & Groceries">{t('categories.food')}</option>
+                      <option value="Electronics">{t('categories.electronics')}</option>
+                      <option value="Household">{t('categories.household')}</option>
+                      <option value="Clothing">{t('categories.clothing')}</option>
+                      <option value="Books">{t('categories.books')}</option>
+                      <option value="Personal Care">{t('categories.personalCare')}</option>
+                      <option value="Gaming">{t('categories.gaming')}</option>
+                      <option value="Kids">{t('categories.kids')}</option>
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground ml-1">Condition</label>
+                    <label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground ml-1">{t('browse.condition')}</label>
                     <select 
                       name="condition"
                       className="w-full h-14 rounded-2xl bg-white border border-border px-4 text-sm font-bold focus:ring-2 focus:ring-primary outline-none"
                       value={formData.condition}
                       onChange={handleChange}
                     >
-                      <option>Unopened</option>
-                      <option>Like New</option>
-                      <option>Good</option>
-                      <option>Used</option>
+                      <option value="Unopened">{t('condition.unopened', 'Unopened')}</option>
+                      <option value="Like New">{t('condition.likeNew', 'Like New')}</option>
+                      <option value="Good">{t('condition.good', 'Good')}</option>
+                      <option value="Used">{t('condition.used', 'Used')}</option>
                     </select>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground ml-1">Description</label>
+                  <label className="text-[11px] font-black uppercase tracking-widest text-muted-foreground ml-1">{t('common.description', 'Description')}</label>
                   <textarea 
                     name="description"
                     rows={4}
@@ -455,6 +456,7 @@ const CreateListing = () => {
                     onChange={handleChange}
                   />
                 </div>
+                {/* ... rest of step 2 ... */}
 
                 {formData.category === 'Food & Groceries' && (
                   <div className="space-y-2">

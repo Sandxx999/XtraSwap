@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import API from '@/lib/api';
+// ... (rest of imports)
 import ListingCard from '@/components/ListingCard';
 import CategoryChip from '@/components/CategoryChip';
 import { Input } from '@/components/ui/input';
@@ -19,107 +21,26 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const categories = [
-  { label: 'All', icon: '✨' },
-  { label: 'Food & Groceries', icon: '🥗' },
-  { label: 'Electronics', icon: '💻' },
-  { label: 'Household', icon: '🏠' },
-  { label: 'Clothing', icon: '👗' },
-  { label: 'Books', icon: '📚' },
-  { label: 'Personal Care', icon: '🧴' },
-  { label: 'Gaming', icon: '🎮' },
-  { label: 'Kids', icon: '🧸' },
-];
-
-const sampleListings = [
-  {
-    id: '1',
-    title: 'Fresh Organic Avocados - Pack of 3',
-    price: 150,
-    mrp: 299,
-    image: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&q=80&w=400',
-    condition: 'Unopened' as const,
-    category: 'Food & Groceries',
-    seller: { name: 'Priya K.', rating: 4.8 },
-    location: 'Kondapur',
-    distance: '0.8 km',
-    createdAt: '2 hrs ago',
-    isFood: true,
-    expiryDate: '3 days'
-  },
-  {
-    id: '2',
-    title: 'Sony WH-1000XM4 Wireless Headphones',
-    price: 12500,
-    mrp: 24990,
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=400',
-    condition: 'Like New' as const,
-    category: 'Electronics',
-    seller: { name: 'Rahul S.', rating: 4.9 },
-    location: 'Gachibowli',
-    distance: '1.5 km',
-    createdAt: '5 hrs ago'
-  },
-  {
-    id: '3',
-    title: 'Minimalist Ceramic Vase - White',
-    price: 450,
-    mrp: 899,
-    image: 'https://images.unsplash.com/photo-1581783898377-1c85bf937427?auto=format&fit=crop&q=80&w=400',
-    condition: 'Good' as const,
-    category: 'Household',
-    seller: { name: 'Anita M.', rating: 4.5 },
-    location: 'Madhapur',
-    distance: '2.1 km',
-    createdAt: '1 day ago'
-  },
-  {
-    id: '4',
-    title: 'Vintage Leather Jacket - Size M',
-    price: 2200,
-    mrp: 5500,
-    image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&q=80&w=400',
-    condition: 'Used' as const,
-    category: 'Clothing',
-    seller: { name: 'Vikram R.', rating: 4.7 },
-    location: 'Hitech City',
-    distance: '3.0 km',
-    createdAt: '3 hrs ago'
-  },
-  {
-    id: '5',
-    title: 'Instant Pot Duo 7-in-1 Smart Cooker',
-    price: 4500,
-    mrp: 9999,
-    image: 'https://images.unsplash.com/photo-1584990344321-2766250d1174?auto=format&fit=crop&q=80&w=400',
-    condition: 'Like New' as const,
-    category: 'Electronics',
-    seller: { name: 'Sameer L.', rating: 4.6 },
-    location: 'Financial District',
-    distance: '4.2 km',
-    createdAt: '6 hrs ago'
-  },
-  {
-    id: '6',
-    title: 'Pack of 5 Cotton T-shirts (Unopened)',
-    price: 800,
-    mrp: 1999,
-    image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=400',
-    condition: 'Unopened' as const,
-    category: 'Clothing',
-    seller: { name: 'Meera V.', rating: 4.8 },
-    location: 'Kondapur',
-    distance: '1.1 km',
-    createdAt: '10 hrs ago'
-  }
-];
-
 const Browse = () => {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
+  // ... rest of state
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
+
+  const categories = [
+    { label: t('categories.all', 'All'), value: 'All', icon: '✨' },
+    { label: t('categories.food', 'Food & Groceries'), value: 'Food & Groceries', icon: '🥗' },
+    { label: t('categories.electronics', 'Electronics'), value: 'Electronics', icon: '💻' },
+    { label: t('categories.household', 'Household'), value: 'Household', icon: '🏠' },
+    { label: t('categories.clothing', 'Clothing'), value: 'Clothing', icon: '👗' },
+    { label: t('categories.books', 'Books'), value: 'Books', icon: '📚' },
+    { label: t('categories.personalCare', 'Personal Care'), value: 'Personal Care', icon: '🧴' },
+    { label: t('categories.gaming', 'Gaming'), value: 'Gaming', icon: '🎮' },
+    { label: t('categories.kids', 'Kids'), value: 'Kids', icon: '🧸' },
+  ];
 
   const categoryParam = searchParams.get('category') || 'All';
   const sortParam = searchParams.get('sort') || 'latest';
@@ -196,8 +117,10 @@ const Browse = () => {
           <div className="relative flex-1 group w-full">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
             <Input 
-              placeholder="Search items near you..." 
+              placeholder={t('browse.searchPlaceholder')}
               className="h-12 pl-12 pr-12 rounded-2xl bg-[#F1F5F9] border-transparent focus-visible:ring-primary w-full font-medium"
+              onChange={handleSearchChange}
+              defaultValue={searchParam}
             />
             <button className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors">
               <MapPin size={20} />
@@ -210,20 +133,20 @@ const Browse = () => {
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               className={`rounded-2xl h-12 px-6 font-bold gap-2 border-2 ${isFilterOpen ? 'border-primary text-primary bg-primary/5' : 'border-border'}`}
             >
-              <Filter size={18} /> Filters
+              <Filter size={18} /> {t('browse.filters')}
             </Button>
             
             <div className="relative flex-1 md:flex-initial">
               <select 
                 value={sortParam}
-                onChange={(e) => setSearchParams({ category: categoryParam, sort: e.target.value })}
+                onChange={(e) => handleSortChange(e.target.value)}
                 className="h-12 w-full md:w-48 rounded-2xl bg-white border-2 border-border px-4 pr-10 appearance-none font-bold text-sm outline-none focus:border-primary transition-colors"
               >
-                <option value="latest">Latest First</option>
-                <option value="nearest">Nearest First</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="expiring">Expiring Soon</option>
+                <option value="latest">{t('browse.latest')}</option>
+                <option value="nearest">{t('browse.nearest')}</option>
+                <option value="price-low">{t('browse.priceLow')}</option>
+                <option value="price-high">{t('browse.priceHigh')}</option>
+                <option value="expiring">{t('browse.expiring')}</option>
               </select>
               <ArrowUpDown className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" size={16} />
             </div>
@@ -236,23 +159,23 @@ const Browse = () => {
           {/* Sidebar Filters (Desktop) */}
           <aside className="hidden lg:block w-64 shrink-0 space-y-8 sticky top-40 h-fit">
             <div className="space-y-4">
-              <h3 className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">Categories</h3>
+              <h3 className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">{t('browse.sidebarCategories')}</h3>
               <div className="flex flex-col gap-2">
                 {categories.map((cat) => (
                   <button
-                    key={cat.label}
-                    onClick={() => handleCategoryChange(cat.label)}
-                    className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all ${categoryParam === cat.label ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white text-secondary-foreground hover:bg-slate-50 border border-border'}`}
+                    key={cat.value}
+                    onClick={() => handleCategoryChange(cat.value)}
+                    className={`flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm transition-all ${categoryParam === cat.value ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white text-secondary-foreground hover:bg-slate-50 border border-border'}`}
                   >
                     <span>{cat.icon} {cat.label}</span>
-                    {categoryParam === cat.label && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                    {categoryParam === cat.value && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">Distance Radius</h3>
+              <h3 className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">{t('browse.distanceRadius')}</h3>
               <div className="px-2">
                  <input type="range" min="1" max="50" className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary" />
                  <div className="flex justify-between mt-2 text-[10px] font-black uppercase text-muted-foreground">
@@ -264,7 +187,7 @@ const Browse = () => {
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">Condition</h3>
+              <h3 className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">{t('browse.condition')}</h3>
               <div className="space-y-3">
                 {['Unopened', 'Like New', 'Good', 'Used'].map((cond) => (
                   <label key={cond} className="flex items-center gap-3 cursor-pointer group">
@@ -279,8 +202,8 @@ const Browse = () => {
             </div>
 
             <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
-               <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">Eco Tip</p>
-               <p className="text-xs font-semibold text-primary/80 leading-relaxed">Buying locally reduces carbon footprint by eliminating long-distance shipping!</p>
+               <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">{t('browse.ecoTip')}</p>
+               <p className="text-xs font-semibold text-primary/80 leading-relaxed">{t('browse.ecoTipBody')}</p>
             </div>
           </aside>
 
@@ -288,8 +211,8 @@ const Browse = () => {
           <div className="flex-1 space-y-8">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-black">
-                {categoryParam === 'All' ? 'Discover Essentials' : categoryParam}
-                <span className="ml-2 text-sm font-bold text-muted-foreground font-sans">({filteredListings.length} items found)</span>
+                {categoryParam === 'All' ? t('browse.discoverEssentials') : t(`categories.${categoryParam.toLowerCase().replace(/ & /g, '').replace(/ /g, '')}`, categoryParam)}
+                <span className="ml-2 text-sm font-bold text-muted-foreground font-sans">({filteredListings.length} {t('browse.itemsFound')})</span>
               </h2>
               <div className="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg bg-white shadow-sm text-primary">
@@ -344,14 +267,14 @@ const Browse = () => {
                 <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
                   <Search size={40} />
                 </div>
-                <h3 className="text-xl font-bold mb-2">No items found</h3>
+                <h3 className="text-xl font-bold mb-2">{t('browse.noItemsFound')}</h3>
                 <p className="text-muted-foreground mb-8">Try adjusting your filters or search term.</p>
                 <Button 
                   onClick={() => setSearchParams({ category: 'All' })}
                   variant="outline" 
                   className="rounded-full h-12 px-8 font-bold"
                 >
-                  Reset all filters
+                  {t('browse.resetFilters')}
                 </Button>
               </motion.div>
             )}
@@ -360,13 +283,14 @@ const Browse = () => {
             {filteredListings.length > 0 && (
               <div className="flex justify-center pt-12">
                  <Button variant="ghost" className="rounded-full h-14 px-12 font-black text-primary hover:bg-primary/5 uppercase tracking-widest text-xs border-2 border-primary/20">
-                    Load More Items
+                    {t('browse.loadMore')}
                  </Button>
               </div>
             )}
           </div>
         </div>
       </div>
+// ... rest of file
 
       {/* Mobile Filter Bottom Sheet Overlay */}
       {isFilterOpen && (

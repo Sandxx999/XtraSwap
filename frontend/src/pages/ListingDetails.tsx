@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import API from '@/lib/api';
+// ... rest of imports
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -28,6 +30,7 @@ import { motion } from 'framer-motion';
 import ListingCard from '@/components/ListingCard';
 
 const ListingDetails = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const [listing, setListing] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -36,6 +39,7 @@ const ListingDetails = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+// ... rest of file
     const fetchListing = async () => {
       setLoading(true);
       try {
@@ -125,21 +129,21 @@ const ListingDetails = () => {
 
             {/* Item Details (Desktop Only Section) */}
             <div className="hidden lg:block space-y-8 pt-8 border-t">
-              <h2 className="text-2xl font-bold">Item Description</h2>
+              <h2 className="text-2xl font-bold">{t('common.description', 'Item Description')}</h2>
               <p className="text-secondary-foreground text-lg leading-relaxed whitespace-pre-line">
                 {listing.description}
               </p>
               
               <div className="grid grid-cols-2 gap-8 pt-4">
                 <div className="space-y-4">
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Specifications</h3>
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{t('common.specifications', 'Specifications')}</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between py-2 border-b border-dashed">
-                      <span className="text-muted-foreground">Condition</span>
+                      <span className="text-muted-foreground">{t('browse.condition')}</span>
                       <span className="font-bold">{listing.condition}</span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-dashed">
-                      <span className="text-muted-foreground">Category</span>
+                      <span className="text-muted-foreground">{t('navbar.categories')}</span>
                       <span className="font-bold">{listing.category}</span>
                     </div>
                     <div className="flex justify-between py-2 border-b border-dashed">

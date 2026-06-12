@@ -52,7 +52,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
+        sans: ["Inter", "Noto Sans Telugu", "Noto Sans Devanagari", "sans-serif"],
       },
       borderRadius: {
         "2xl": "1rem",

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   ArrowRight, 
   CheckCircle2, 
@@ -15,18 +16,6 @@ import {
 import { motion } from 'framer-motion';
 import CategoryChip from '@/components/CategoryChip';
 import ListingCard from '@/components/ListingCard';
-
-const categories = [
-  { label: 'All', icon: '✨' },
-  { label: 'Food & Groceries', icon: '🥗' },
-  { label: 'Electronics', icon: '💻' },
-  { label: 'Household', icon: '🏠' },
-  { label: 'Clothing', icon: '👗' },
-  { label: 'Books', icon: '📚' },
-  { label: 'Personal Care', icon: '🧴' },
-  { label: 'Gaming', icon: '🎮' },
-  { label: 'Kids', icon: '🧸' },
-];
 
 const sampleListings = [
   {
@@ -86,8 +75,21 @@ const sampleListings = [
 ];
 
 const Home = () => {
+  const { t } = useTranslation();
   const [activeCategory, setActiveCategory] = useState('All');
   const navigate = useNavigate();
+
+  const categories = [
+    { label: t('categories.all', 'All'), icon: '✨' },
+    { label: t('categories.food', 'Food & Groceries'), icon: '🥗' },
+    { label: t('categories.electronics', 'Electronics'), icon: '💻' },
+    { label: t('categories.household', 'Household'), icon: '🏠' },
+    { label: t('categories.clothing', 'Clothing'), icon: '👗' },
+    { label: t('categories.books', 'Books'), icon: '📚' },
+    { label: t('categories.personalCare', 'Personal Care'), icon: '🧴' },
+    { label: t('categories.gaming', 'Gaming'), icon: '🎮' },
+    { label: t('categories.kids', 'Kids'), icon: '🧸' },
+  ];
 
   const getNearMeListings = () => {
     if (navigator.geolocation) {
@@ -112,15 +114,14 @@ const Home = () => {
             >
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-accent text-[11px] font-bold uppercase tracking-wider mb-6">
                 <Sparkles size={14} />
-                Sustainable Marketplace
+                {t('home.heroBadge')}
               </div>
               <h1 className="text-5xl md:text-7xl font-extrabold leading-[1.1] tracking-tight text-foreground">
-                Turn Your <span className="text-[#0F172A]">Extras</span> Into<br />
-                <span className="text-primary">Someone's Essentials</span>
+                {t('home.heroTitleMain')} <span className="text-[#0F172A]">{t('home.heroTitleExtras')}</span> {t('home.heroTitleInto')}<br />
+                <span className="text-primary">{t('home.heroTitleEssentials')}</span>
               </h1>
               <p className="text-lg text-secondary-foreground mt-6 max-w-xl leading-relaxed">
-                Neighborhood re-commerce for surplus groceries, electronics, and household items. 
-                Save money, reduce waste, and build community.
+                {t('home.heroSubtitle')}
               </p>
             </motion.div>
 
@@ -132,12 +133,12 @@ const Home = () => {
             >
               <Link to="/browse">
                 <Button className="rounded-full bg-primary hover:bg-primary-dark h-14 px-8 text-lg font-bold shadow-lg shadow-primary/25 gap-2">
-                  Start Swapping <ArrowRight size={20} />
+                  {t('home.startSwapping')} <ArrowRight size={20} />
                 </Button>
               </Link>
               <Link to="/create-listing">
                 <Button variant="outline" className="rounded-full border-border bg-white h-14 px-8 text-lg font-bold shadow-sm hover:bg-slate-50">
-                  List an Item
+                  {t('home.listItem')}
                 </Button>
               </Link>
             </motion.div>
@@ -150,18 +151,19 @@ const Home = () => {
             >
               <div className="flex items-center gap-2 text-sm font-semibold text-secondary-foreground">
                 <CheckCircle2 size={18} className="text-accent" />
-                <span>12,000+ Items Listed</span>
+                <span>{t('home.itemsListed')}</span>
               </div>
               <div className="flex items-center gap-2 text-sm font-semibold text-secondary-foreground">
                 <CheckCircle2 size={18} className="text-accent" />
-                <span>Verified Sellers</span>
+                <span>{t('home.verifiedSellers')}</span>
               </div>
               <div className="flex items-center gap-2 text-sm font-semibold text-secondary-foreground">
                 <CheckCircle2 size={18} className="text-accent" />
-                <span>Safe Payments</span>
+                <span>{t('home.safePayments')}</span>
               </div>
             </motion.div>
           </div>
+          {/* ... rest of the file ... */}
 
           {/* Right Side Collage */}
           <div className="flex-1 relative hidden lg:block h-[500px]">
@@ -234,8 +236,8 @@ const Home = () => {
                 <TrendingUp size={24} />
               </div>
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold">Near You</h2>
-                <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Hyper-local deals in your area</p>
+                <h2 className="text-2xl md:text-3xl font-bold">{t('home.nearYou')}</h2>
+                <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">{t('home.nearYouSubtitle')}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -245,10 +247,10 @@ const Home = () => {
                 size="sm" 
                 className="rounded-full font-bold border-primary text-primary hover:bg-primary/5 gap-2"
               >
-                <MapPin size={14} /> Near Me
+                <MapPin size={14} /> {t('home.nearMe')}
               </Button>
               <Link to="/browse" className="text-sm font-bold text-primary hover:underline flex items-center gap-1">
-                View All <ArrowRight size={14} />
+                {t('home.viewAll')} <ArrowRight size={14} />
               </Link>
             </div>
           </div>
@@ -264,10 +266,10 @@ const Home = () => {
               <div className="p-2 bg-warning/10 rounded-xl text-warning">
                 <Clock size={24} />
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold">Ending Soon <span className="animate-pulse">🔥</span></h2>
+              <h2 className="text-2xl md:text-3xl font-bold">{t('home.endingSoon')} <span className="animate-pulse">🔥</span></h2>
             </div>
             <Link to="/browse?sort=expiring" className="text-sm font-bold text-primary hover:underline flex items-center gap-1">
-              View All <ArrowRight size={14} />
+              {t('home.viewAll')} <ArrowRight size={14} />
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center">
@@ -316,13 +318,13 @@ const Home = () => {
       {/* Footer / Just Listed */}
       <section className="py-20 container mx-auto px-4">
         <div className="bg-primary/5 rounded-[40px] p-12 text-center space-y-6">
-          <h2 className="text-4xl font-bold">Ready to Declutter?</h2>
+          <h2 className="text-4xl font-bold">{t('home.readyToDeclutter')}</h2>
           <p className="text-lg text-secondary-foreground max-w-2xl mx-auto">
-            List your first item in less than 2 minutes. It's free, fast, and local.
+            {t('home.declutterSubtitle')}
           </p>
           <Link to="/create-listing" className="inline-block">
             <Button size="lg" className="rounded-full bg-primary h-14 px-12 text-lg font-bold shadow-xl shadow-primary/25">
-              List Your Item Now
+              {t('home.listNow')}
             </Button>
           </Link>
         </div>

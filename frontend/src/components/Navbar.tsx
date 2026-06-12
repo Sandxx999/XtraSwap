@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { 
   Search, 
   PlusCircle, 
@@ -9,7 +10,8 @@ import {
   Menu,
   MessageSquare,
   MapPin,
-  X
+  X,
+  Languages
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -24,6 +26,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 const Navbar = () => {
+  const { t, i18n } = useTranslation();
   const [userInfo, setUserInfo] = useState<any>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -41,6 +44,10 @@ const Navbar = () => {
     navigate('/login');
   };
 
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+  };
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border bg-white/80 backdrop-blur-md">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between gap-4">
@@ -52,17 +59,17 @@ const Navbar = () => {
 
         {/* Desktop Navigation Links */}
         <div className="hidden lg:flex items-center gap-6 text-sm font-medium text-secondary-foreground">
-          <Link to="/browse" className="hover:text-primary transition-colors">Browse</Link>
-          <Link to="#" className="hover:text-primary transition-colors">How It Works</Link>
+          <Link to="/browse" className="hover:text-primary transition-colors">{t('navbar.browse')}</Link>
+          <Link to="#" className="hover:text-primary transition-colors">{t('navbar.howItWorks')}</Link>
           <DropdownMenu>
             <DropdownMenuTrigger className="hover:text-primary transition-colors outline-none">
-              Categories
+              {t('navbar.categories')}
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-48">
-              <DropdownMenuItem onClick={() => navigate('/browse?category=food')}>🥗 Food & Groceries</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/browse?category=electronics')}>💻 Electronics</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/browse?category=household')}>🏠 Household</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/browse?category=clothing')}>👗 Clothing</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/browse?category=food')}>🥗 {t('categories.food')}</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/browse?category=electronics')}>💻 {t('categories.electronics')}</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/browse?category=household')}>🏠 {t('categories.household')}</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/browse?category=clothing')}>👗 {t('categories.clothing')}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -73,7 +80,7 @@ const Navbar = () => {
             <Search size={18} />
           </div>
           <Input 
-            placeholder="Search items near you..." 
+            placeholder={t('navbar.searchPlaceholder')}
             className="pl-10 pr-10 rounded-full bg-[#F1F5F9] border-transparent focus-visible:ring-primary h-10 w-full"
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground cursor-pointer hover:text-primary">
@@ -83,6 +90,28 @@ const Navbar = () => {
 
         {/* Right Side Actions */}
         <div className="flex items-center gap-3">
+          {/* Language Selector */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary rounded-full">
+                <Languages size={20} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuLabel>Select Language</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => changeLanguage('en')} className={i18n.language === 'en' ? 'bg-secondary font-bold' : ''}>
+                English
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => changeLanguage('te')} className={i18n.language === 'te' ? 'bg-secondary font-bold' : ''}>
+                తెలుగు (Telugu)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => changeLanguage('hi')} className={i18n.language === 'hi' ? 'bg-secondary font-bold' : ''}>
+                हिन्दी (Hindi)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <div className="hidden sm:flex items-center gap-2">
             <Link to="/inbox">
               <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary rounded-full relative">
@@ -112,11 +141,11 @@ const Navbar = () => {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate('/dashboard')}>
                     <LayoutDashboard className="mr-2 h-4 w-4" />
-                    <span>Dashboard</span>
+                    <span>{t('navbar.dashboard')}</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={logoutHandler} className="text-destructive focus:text-destructive">
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>Logout</span>
+                    <span>{t('navbar.logout')}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -126,7 +155,7 @@ const Navbar = () => {
                 className="font-semibold text-sm hover:text-primary"
                 onClick={() => navigate('/login')}
               >
-                Sign In
+                {t('navbar.signIn')}
               </Button>
             )}
           </div>
@@ -136,7 +165,7 @@ const Navbar = () => {
             onClick={() => navigate('/create-listing')}
           >
             <PlusCircle size={18} />
-            Sell Item
+            {t('navbar.sellItem')}
           </Button>
 
           {/* Mobile Menu Toggle */}
@@ -155,15 +184,24 @@ const Navbar = () => {
       {isMobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 top-16 bg-white z-40 flex flex-col p-4 animate-in slide-in-from-right duration-300">
           <div className="flex flex-col gap-4 text-lg font-semibold mb-8">
-            <Link to="/browse" onClick={() => setIsMobileMenuOpen(false)}>Browse</Link>
-            <Link to="#" onClick={() => setIsMobileMenuOpen(false)}>How It Works</Link>
-            {!userInfo && <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>Sign In</Link>}
+            <Link to="/browse" onClick={() => setIsMobileMenuOpen(false)}>{t('navbar.browse')}</Link>
+            <Link to="#" onClick={() => setIsMobileMenuOpen(false)}>{t('navbar.howItWorks')}</Link>
+            {!userInfo && <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>{t('navbar.signIn')}</Link>}
             {userInfo && (
               <>
-                <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</Link>
-                <button onClick={() => { logoutHandler(); setIsMobileMenuOpen(false); }} className="text-left text-destructive">Logout</button>
+                <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>{t('navbar.dashboard')}</Link>
+                <button onClick={() => { logoutHandler(); setIsMobileMenuOpen(false); }} className="text-left text-destructive">{t('navbar.logout')}</button>
               </>
             )}
+            
+            <div className="border-t pt-4 mt-4">
+              <p className="text-sm text-muted-foreground mb-2">Language</p>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => changeLanguage('en')} className={i18n.language === 'en' ? 'bg-primary text-white' : ''}>EN</Button>
+                <Button variant="outline" size="sm" onClick={() => changeLanguage('te')} className={i18n.language === 'te' ? 'bg-primary text-white' : ''}>తెలుగు</Button>
+                <Button variant="outline" size="sm" onClick={() => changeLanguage('hi')} className={i18n.language === 'hi' ? 'bg-primary text-white' : ''}>हिन्दी</Button>
+              </div>
+            </div>
           </div>
           <Button 
             className="w-full rounded-xl bg-primary hover:bg-primary-dark h-12 text-lg font-bold mb-4"
@@ -172,11 +210,11 @@ const Navbar = () => {
               setIsMobileMenuOpen(false);
             }}
           >
-            Sell an Item
+            {t('navbar.sellItem')}
           </Button>
           <div className="relative mt-auto pb-8">
             <Input 
-              placeholder="Search items near you..." 
+              placeholder={t('navbar.searchPlaceholder')}
               className="pl-10 rounded-xl bg-[#F1F5F9] border-transparent h-12"
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
