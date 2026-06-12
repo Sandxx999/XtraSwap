@@ -1,0 +1,46 @@
+{
+  "navbar": {
+    "browse": "Browse",
+    "howItWorks": "How It Works",
+    "categories": "Categories",
+    "searchPlaceholder": "Search items near you...",
+    "signIn": "Sign In",
+    "sellItem": "Sell Item",
+    "dashboard": "Dashboard",
+    "logout": "Logout",
+    "inbox": "Inbox"
+  },
+  "categories": {
+    "all": "All",
+    "food": "Food & Groceries",
+    "electronics": "Electronics",
+    "household": "Household",
+    "clothing": "Clothing",
+    "books": "Books",
+    "personalCare": "Personal Care",
+    "gaming": "Gaming",
+    "kids": "Kids"
+  },
+  "home": {
+    "hero": {
+      "sustainable": "Sustainable Marketplace",
+      "title": "Turn Your <0>Extras</0> Into <1>Someone's Essentials</1>",
+      "subtitle": "Neighborhood re-commerce for surplus groceries, electronics, and household items. Save money, reduce waste, and build community.",
+      "startSwapping": "Start Swapping",
+      "listItem": "List an Item"
+    },
+    "stats": {
+      "itemsListed": "12,000+ Items Listed",
+      "verifiedSellers": "Verified Sellers",
+      "safePayments": "Safe Payments"
+    },
+    "nearYou": "Near You",
+    "hyperLocal": "Hyper-local deals in your area",
+    "endingSoon": "Ending Soon",
+    "viewAll": "View All",
+    "nearMe": "Near Me",
+    "readyToDeclutter": "Ready to Declutter?",
+    "declutterSubtitle": "List your first item in less than 2 minutes. It's free, fast, and local.",
+    "listNow": "List Your Item Now"
+  }
+}

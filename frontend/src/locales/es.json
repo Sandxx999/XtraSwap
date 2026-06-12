@@ -1,0 +1,46 @@
+{
+  "navbar": {
+    "browse": "Explorar",
+    "howItWorks": "Cómo funciona",
+    "categories": "Categorías",
+    "searchPlaceholder": "Buscar artículos cerca de ti...",
+    "signIn": "Iniciar sesión",
+    "sellItem": "Vender artículo",
+    "dashboard": "Panel de control",
+    "logout": "Cerrar sesión",
+    "inbox": "Bandeja de entrada"
+  },
+  "categories": {
+    "all": "Todo",
+    "food": "Comida y comestibles",
+    "electronics": "Electrónica",
+    "household": "Hogar",
+    "clothing": "Ropa",
+    "books": "Libros",
+    "personalCare": "Cuidado personal",
+    "gaming": "Videojuegos",
+    "kids": "Niños"
+  },
+  "home": {
+    "hero": {
+      "sustainable": "Mercado Sostenible",
+      "title": "Convierte tus <0>Sobras</0> en <1>Esenciales de Alguien</1>",
+      "subtitle": "Comercio de proximidad para excedentes de comestibles, electrónica y artículos para el hogar. Ahorra dinero, reduce residuos y crea comunidad.",
+      "startSwapping": "Empezar a intercambiar",
+      "listItem": "Publicar un artículo"
+    },
+    "stats": {
+      "itemsListed": "Más de 12,000 artículos publicados",
+      "verifiedSellers": "Vendedores verificados",
+      "safePayments": "Pagos seguros"
+    },
+    "nearYou": "Cerca de ti",
+    "hyperLocal": "Ofertas hiperlocales en tu zona",
+    "endingSoon": "Termina pronto",
+    "viewAll": "Ver todo",
+    "nearMe": "Cerca de mí",
+    "readyToDeclutter": "¿Listo para ordenar?",
+    "declutterSubtitle": "Publica tu primer artículo en menos de 2 minutos. Es gratis, rápido y local.",
+    "listNow": "Publica tu artículo ahora"
+  }
+}
